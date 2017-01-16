@@ -42,6 +42,7 @@ abstract class FluidRenderingViewHelper implements ViewHelper
         try {
             $arguments = array_map('trim', $arguments);
             $view = ViewUtility::getView();
+
             $templateName = $arguments[0];
             if ($this->isValidTemplateName($templateName)) {
                 $view->setTemplate($templateName);

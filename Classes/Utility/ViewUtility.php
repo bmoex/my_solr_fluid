@@ -17,6 +17,7 @@ class ViewUtility
         );
 
         $template = $configuration->getValueByPathOrDefaultValue('view.', []);
+        static::validateViewConfiguration($template);
 
         $view = static::getStandaloneView();
         $view->setLayoutRootPaths($template['layoutRootPaths.']);
@@ -26,6 +27,21 @@ class ViewUtility
         // Configure settings based on configuration
         $view->assign('settings', $configuration->getValueByPathOrDefaultValue('settings.', []));
         return $view;
+    }
+
+    /**
+     * Validate view configuration
+     *
+     * @param array $configuration
+     * @return bool
+     * @throws \Apache_Solr_ParserException
+     */
+    protected static function validateViewConfiguration($configuration)
+    {
+        if (empty($configuration['templateRootPaths.'])) {
+            throw new \Apache_Solr_ParserException('Invalid template root paths configured', 1484599682929);
+        } 
+        return true;
     }
 
     /**
