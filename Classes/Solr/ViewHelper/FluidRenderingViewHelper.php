@@ -65,6 +65,6 @@ abstract class FluidRenderingViewHelper implements ViewHelper
      */
     protected function isValidTemplateName($templateName)
     {
-        return (preg_match('/[^A-Za-z]/', $templateName) === false);
+        return (bool)(preg_match('/[^a-z\s-]/i', $templateName)) === false;
     }
 }

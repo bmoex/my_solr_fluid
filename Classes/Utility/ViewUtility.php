@@ -25,8 +25,43 @@ class ViewUtility
         $view->setTemplateRootPaths($template['templateRootPaths.']);
 
         // Configure settings based on configuration
-        $view->assign('settings', $configuration->getValueByPathOrDefaultValue('settings.', []));
+        $view->assign('settings', static::getCleanSettings(
+            $configuration->getValueByPathOrDefaultValue('settings.', []))
+        );
         return $view;
+    }
+
+    /**
+     * Get cleaned typoscript array
+     *  settings.array = 1
+     *  settings.array {
+     *    sub.settings = 2
+     *  }
+     *
+     * @param array $settings
+     * @return array
+     */
+    protected static function getCleanSettings(array $settings)
+    {
+        $output = [];
+        foreach ($settings as $key => $value) {
+            $key = trim($key, '.');
+
+            if (isset($output[$key]) && is_array($value)) {
+                $value['_key'] = $output[$key];
+            } elseif (is_array($output[$key]) && is_string($value)) {
+                $value = ['_key' => $value] + $output[$key];
+            }
+
+            if (is_array($value)) {
+                $output[$key] = static::getCleanSettings($value);
+            } else {
+                $output[$key] = $value;
+            }
+        }
+
+        ksort($output);
+        return $output;
     }
 
     /**
@@ -40,7 +75,7 @@ class ViewUtility
     {
         if (empty($configuration['templateRootPaths.'])) {
             throw new \Apache_Solr_ParserException('Invalid template root paths configured', 1484599682929);
-        } 
+        }
         return true;
     }
 
